@@ -8,19 +8,92 @@ services:
       - .env
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+    
+  backend:
+    build: .
+    container_name: backend
+    env_file:
+      - .env
+    environment:
+      - HOST=db
+      - PORT=5432
     ports:
-      - '543:5432'
-    # healthcheck:
-    #   test:
-    #     ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy 
+    volumes:
+      - upload_data:/app/uploads
+
   redis:
-    image: redis:latest
+    image: redis:7.2
     volumes:
       - redis_data:/data
+
+  backend-migrations:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - HOST=db
+      - PORT=5432
+    command: bash -c "make migrate"
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_started
+  
+  backend-superuser:
+    build: .
+    env_file:
+      - .env
+    environment:
+      - HOST=db
+      - PORT=5432
+    command: bash -c "make create-superuser"
+    depends_on:
+      db:
+        condition: service_healthy
+      backend-migrations:
+        condition: service_started
+      backend:
+        condition: service_started
+
+  celery:
+    build: .
+    command: ["celery", "-A", "file_processing_project", "worker", "--loglevel=info", "--concurrency=1"]
+    env_file:
+      - .env
+    environment:
+      - HOST=db
+      - PORT=5432
+    depends_on:
+      backend:
+        condition: service_started
+      redis:
+        condition: service_started
+    volumes:
+      - celery_data:/file_processing_project/celery_data  
+      - upload_data:/app/uploads
+
+  nginx:
+    image: nginx:1.25
+    container_name: nginx
     ports:
-      - '6379:6379'
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+
 
 volumes:
   redis_data:
   pg_data:
+  celery_data:
+  upload_data:
 

@@ -306,3 +306,5 @@ $RECYCLE.BIN/
 /media/
 # End of https://www.toptal.com/developers/gitignore/api/django,python,windows,linux
 celerybeat-schedule.db
+/uploads
+test.py
