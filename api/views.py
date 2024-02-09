@@ -5,6 +5,8 @@ from rest_framework import status
 from .models import File
 from .serializers import FileSerializer
 from .tasks import process_uploaded_file
+from rest_framework import generics, views
+
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser])
@@ -21,3 +23,8 @@ def upload_file(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class FileListApiView(generics.ListAPIView):
+    queryset = File.objects.all()
+    serializer_class = FileSerializer
