@@ -125,7 +125,7 @@ MAX_FILE_SIZE = 10 * 1024 * 1024
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-UPLOAD_ROOT = '/app/uploads/'
+UPLOAD_ROOT = os.path.join(BASE_DIR, "uploads")
 UPLOAD_URL = '/uploads/'
 
 STATIC_URL = "/static/"
