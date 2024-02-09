@@ -21,3 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('api.urls'))
 ]
+urlpatterns += static(settings.UPLOAD_URL, document_root=settings.UPLOAD_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
