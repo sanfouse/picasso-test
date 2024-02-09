@@ -5,8 +5,8 @@ from rest_framework import status
 from .models import File
 from .serializers import FileSerializer
 from .tasks import process_uploaded_file
-from rest_framework import generics, views
-
+from rest_framework import generics
+from file_processing_project.settings import MAX_FILE_SIZE
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser])
@@ -15,6 +15,9 @@ def upload_file(request):
 
     if not file:
         return Response({'error': 'No file provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if file.size > MAX_FILE_SIZE:
+        return Response({'error': 'File size exceeds the limit of 10 MB.'}, status=status.HTTP_400_BAD_REQUEST)
 
     serializer = FileSerializer(data={'file': file})
     if serializer.is_valid():
