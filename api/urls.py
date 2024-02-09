@@ -5,4 +5,5 @@ from . import views
 app_name = 'api'
  
 urlpatterns = [
+    path('upload/', views.upload_file, name='upload')
 ]
