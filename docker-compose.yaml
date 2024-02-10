@@ -102,10 +102,14 @@ services:
     container_name: nginx
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - static_data:/app/static
       - upload_data:/app/uploads
+      - ./sanfouse.crt:/etc/ssl/sanfouse.crt:ro
+      - ./sanfouse.key:/etc/ssl/sanfouse.key:ro
+
     depends_on:
       - backend
 
