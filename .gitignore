@@ -308,3 +308,5 @@ $RECYCLE.BIN/
 celerybeat-schedule.db
 /uploads
 test.py
+*.crt
+*.key
